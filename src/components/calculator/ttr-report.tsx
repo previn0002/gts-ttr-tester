@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -33,9 +32,28 @@ interface TTRReportProps {
 
 export function TTRReport({ data, onBack }: TTRReportProps) {
   const handlePrint = () => {
-    setTimeout(() => {
-      window.print();
-    }, 250);
+    const element = document.querySelector('.print-container') as HTMLElement;
+    if (!element) return;
+
+    if (typeof window !== 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      script.onload = () => {
+        const opt = {
+          margin: 0,
+          filename: `TTR-Report-${data.transformerId || 'report'}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        // @ts-ignore
+        window.html2pdf().set(opt).from(element).save();
+      };
+      script.onerror = () => {
+        window.print();
+      };
+      document.head.appendChild(script);
+    }
   };
 
   const taps = generateTaps(data.totalTaps, data.nominalTap, data.tapStep);
@@ -69,7 +87,6 @@ export function TTRReport({ data, onBack }: TTRReportProps) {
       <div className="container mx-auto flex justify-center p-4 print:p-0 print:m-0">
         <div className="bg-white shadow-2xl print-container border overflow-hidden" style={{ width: '210mm', height: '297mm' }}>
           <div className="flex flex-col h-full p-[12mm]">
-            {/* Professional Header */}
             <div className="flex justify-between items-start border-b-4 border-primary pb-4 mb-8">
               <div className="flex-1">
                 <h1 className="text-[28px] font-black text-primary uppercase tracking-tighter leading-tight">GLOBAL TRANSFORMERS AND SWITCHGEAR FZE</h1>
@@ -80,7 +97,6 @@ export function TTRReport({ data, onBack }: TTRReportProps) {
               </div>
             </div>
 
-            {/* Info Grid */}
             <div className="grid grid-cols-2 gap-10 mb-8">
               <div className="space-y-4">
                 <h3 className="text-[14px] font-black text-muted-foreground uppercase tracking-widest border-b-2 pb-1">Equipment Identification</h3>
@@ -116,7 +132,6 @@ export function TTRReport({ data, onBack }: TTRReportProps) {
               </div>
             </div>
 
-            {/* Results Table */}
             <div className="flex-grow">
               <div className="flex items-center gap-2 mb-4">
                 <div className="h-6 w-1 bg-primary" />
@@ -170,7 +185,6 @@ export function TTRReport({ data, onBack }: TTRReportProps) {
               </table>
             </div>
 
-            {/* Signature and Specific Footer */}
             <div className="mt-auto pt-6 border-t">
               <div className="grid grid-cols-2 gap-8 pb-10">
                 <div className="border-t-2 border-black pt-2">
