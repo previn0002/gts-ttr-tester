@@ -1,4 +1,3 @@
-
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
@@ -26,6 +25,8 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -41,6 +42,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased min-h-screen bg-background">
         <FirebaseClientProvider>
+          <ServiceWorkerRegister />
           {children}
           <Toaster />
         </FirebaseClientProvider>
