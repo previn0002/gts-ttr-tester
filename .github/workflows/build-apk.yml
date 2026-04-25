@@ -16,7 +16,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Add generateStaticParams to all dynamic routes
+      - name: Add generateStaticParams to dynamic routes
         run: |
           find src/app -type f -name "page.tsx" | while read file; do
             dir=$(dirname "$file")
@@ -42,4 +42,17 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
