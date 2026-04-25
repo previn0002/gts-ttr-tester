@@ -116,7 +116,6 @@ export default function ReportView() {
   const formattedVectorGroup = useMemo(() => {
     if (!test?.vectorGroup) return 'N/A';
     const vg = test.vectorGroup;
-    // Primary capital, secondary small (e.g., Dyn11)
     return vg.charAt(0).toUpperCase() + vg.slice(1).toLowerCase();
   }, [test?.vectorGroup]);
 
@@ -221,14 +220,15 @@ export default function ReportView() {
             nominalTap={test.nominalTap}
           />
 
-          <div className="grid grid-cols-2 gap-10 mt-auto pb-12 md:pb-20">
+          {/* ✅ CHANGED: mt-auto → mt-16 for more space above signatures */}
+          <div className="grid grid-cols-2 gap-10 mt-16 pb-12 md:pb-20">
             <div className="border-t-2 border-black pt-2">
-              <p className="text-[10px] md:text-[11px] font-black uppercase mb-1">Testing Person Signature</p>
-              <p className="font-black text-sm md:text-md">{test.operatorName || '................................'}</p>
+              <p className="text-[10px] md:text-[11px] font-black uppercase mb-8">Testing Person Signature</p>
+              <p className="font-black text-sm md:text-md">................................</p>
             </div>
             <div className="border-t-2 border-black pt-2">
-              <p className="text-[10px] md:text-[11px] font-black uppercase mb-1">Authorized Inspection Authority</p>
-              <p className="font-black text-sm md:text-md">{test.authorizedAuthority || '................................'}</p>
+              <p className="text-[10px] md:text-[11px] font-black uppercase mb-8">Authorized Inspection Authority</p>
+              <p className="font-black text-sm md:text-md">................................</p>
             </div>
           </div>
 
