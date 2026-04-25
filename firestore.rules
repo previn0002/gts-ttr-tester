@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * FIRESTORE SECURITY RULES - PROTOTYPING PHASE
+     *
+     * CORE PHILOSOPHY:
+     * This ruleset implements a "Public Read, Owner Write" model. It balances the 
+     * requirement for universal access to reports with strict accountability for data 
+     * modifications. 
+     *
+     * DATA STRUCTURE:
+     * All data is organized within a flat, top-level collection: `/test_reports`.
+     * This flat structure ensures maximum query performance and avoids complex 
+     * hierarchical permission inheritance.
+     *
+     * KEY SECURITY DECISIONS:
+     * 1. Public Visibility: In accordance with the requirement for public sharing, 
+     *    all test reports are readable by anyone, including unauthenticated users.
+     * 2. Authenticated Writes: To prevent spam and unauthorized data tampering, 
+     *    all create, update, and delete operations require the user to be signed in 
+     *    (including anonymous authentication).
+     * 3. Ownership-Based Updates: While reports are public, they are not "wiki-style." 
+     *    Only the original creator of a report has the authority to modify or delete it.
+     *
+     * DENORMALIZATION FOR AUTHORIZATION:
+     * To facilitate ownership checks without expensive lookups, a `creatorId` field 
+     * is required on every document. This field is validated against the user's 
+     * UID at the time of creation and enforced as immutable during updates.
+     */
+
+    // --- HELPER FUNCTIONS ---
+
+    /**
+     * @description Checks if the request is from an authenticated user.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user's UID matches the provided ID.
+     * @param userId The UID to compare against the authenticated user.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the user is the owner of the existing document.
+     * Ensures the document exists before performing ownership verification.
+     */
+    function isExistingOwner() {
+      return resource != null && isOwner(resource.data.creatorId);
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for the collection of Transformer Turns Ratio (TTR) test reports.
+     * @path /test_reports/{testReportId}
+     * @allow get, list: if true; (Public access)
+     * @allow create: if authenticated and creatorId matches UID.
+     * @allow update, delete: if authenticated and user is the original creator.
+     * @deny update: if the creatorId field is modified.
+     * @principle Implements Pattern 5: Public Read with Owner-Only Writes.
+     */
+    match /test_reports/{testReportId} {
+      
+      allow get, list: if true;
+
+      allow create: if isSignedIn() && request.resource.data.creatorId == request.auth.uid;
+
+      allow update: if isExistingOwner() && request.resource.data.creatorId == resource.data.creatorId;
+
+      allow delete: if isExistingOwner();
+    }
+
+  }
+}

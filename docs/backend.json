@@ -1,0 +1,115 @@
+{
+  "entities": {
+    "TestReport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TestReport",
+      "type": "object",
+      "description": "Represents a single Transformer Turns Ratio (TTR) test report, including input parameters, calculated results, and pass/fail statuses for each phase.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the TestReport entity."
+        },
+        "testDate": {
+          "type": "string",
+          "description": "The date and time when the TTR test was performed.",
+          "format": "date-time"
+        },
+        "workOrderNo": {
+          "type": "string",
+          "description": "The work order number associated with the test."
+        },
+        "transformerIdentifier": {
+          "type": "string",
+          "description": "An identifier for the transformer under test (e.g., serial number, asset tag)."
+        },
+        "operatorName": {
+          "type": "string",
+          "description": "The name of the operator who conducted the test."
+        },
+        "authorizedAuthority": {
+          "type": "string",
+          "description": "The name of the authorized inspection authority."
+        },
+        "kvaRating": {
+          "type": "number",
+          "description": "The KVA rating of the transformer."
+        },
+        "hvLineVoltage": {
+          "type": "number",
+          "description": "The High Voltage (HV) line voltage input by the user for the test."
+        },
+        "lvLineVoltage": {
+          "type": "number",
+          "description": "The Low Voltage (LV) line voltage input by the user for the test."
+        },
+        "vectorGroup": {
+          "type": "string",
+          "description": "The selected vector group of the transformer (e.g., Dyn11, Dyn1, Dy0, Yy0)."
+        },
+        "totalTaps": {
+          "type": "number",
+          "description": "The total number of tap positions."
+        },
+        "nominalTap": {
+          "type": "number",
+          "description": "The nominal tap position."
+        },
+        "tapStep": {
+          "type": "number",
+          "description": "The percentage step between taps."
+        },
+        "initialMeasurements": {
+          "type": "object",
+          "description": "The measured ratio values for each tap and phase."
+        },
+        "creatorId": {
+          "type": "string",
+          "description": "The UID of the user who created the report."
+        }
+      },
+      "required": [
+        "id",
+        "testDate",
+        "workOrderNo",
+        "transformerIdentifier",
+        "operatorName",
+        "hvLineVoltage",
+        "lvLineVoltage",
+        "kvaRating",
+        "vectorGroup",
+        "totalTaps",
+        "nominalTap",
+        "tapStep",
+        "initialMeasurements",
+        "creatorId"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/test_reports/{testReportId}",
+        "definition": {
+          "entityName": "TestReport",
+          "schema": {
+            "$ref": "#/backend/entities/TestReport"
+          },
+          "description": "Collection of all Transformer Turns Ratio (TTR) test reports.",
+          "params": [
+            {
+              "name": "testReportId",
+              "description": "The unique identifier for a specific TestReport document."
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
