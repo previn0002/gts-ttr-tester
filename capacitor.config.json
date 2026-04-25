@@ -1,6 +1,6 @@
 {
-  "appId": "com.yourname.myapp",
-  "appName": "MyApp",
-  "webDir": "dist",
+  "appId": "com.previn.gtstrrtester",
+  "appName": "GTS TTR TESTER",
+  "webDir": "out",
   "bundledWebRuntime": false
 }
