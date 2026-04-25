@@ -101,8 +101,24 @@ export default function ReportView() {
 
   const { data: test, isLoading } = useDoc(docRef);
 
+  // ✅ FIXED: Works in APK WebView and normal browser
   const handlePrint = () => {
-    window.print();
+    const currentUrl = window.location.href;
+
+    // Detect if running inside Android APK WebView
+    const userAgent = navigator.userAgent;
+    const isAndroid = /Android/i.test(userAgent);
+    const isChrome = /Chrome\/[.0-9]* Mobile/i.test(userAgent);
+    const isWebView = isAndroid && !isChrome;
+
+    if (isWebView) {
+      // Open in Chrome browser so user can print to WiFi printer
+      const intentUrl = 'intent://' + currentUrl.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end';
+      window.location.href = intentUrl;
+    } else {
+      // Normal browser (PC or Chrome on phone)
+      window.print();
+    }
   };
 
   const taps = useMemo(() => {
@@ -145,7 +161,7 @@ export default function ReportView() {
             <span className="hidden sm:inline">New Test</span>
           </Button>
           <div className="flex items-center gap-2 md:gap-4">
-             <Link href={`/edit-test/${test.id}`}>
+            <Link href={`/edit-test/${test.id}`}>
               <Button variant="outline" size="sm" className="font-bold text-xs md:text-sm">Edit</Button>
             </Link>
             <Button 
@@ -220,7 +236,6 @@ export default function ReportView() {
             nominalTap={test.nominalTap}
           />
 
-          {/* ✅ CHANGED: mt-auto → mt-16 for more space above signatures */}
           <div className="grid grid-cols-2 gap-10 mt-16 pb-12 md:pb-20">
             <div className="border-t-2 border-black pt-2">
               <p className="text-[10px] md:text-[11px] font-black uppercase mb-8">Testing Person Signature</p>
