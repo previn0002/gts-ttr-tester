@@ -1,3 +1,5 @@
+export async function generateStaticParams() { return [] }
+
 "use client";
 
 import React, { useMemo } from 'react';
